@@ -3,6 +3,7 @@
 bin/
 build/
 examples/
+**/doc/
 
 # Files
 *.user
