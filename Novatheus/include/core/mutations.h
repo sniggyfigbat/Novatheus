@@ -28,7 +28,7 @@ namespace Core {
 		std::uniform_int_distribution<int> m_distribution;
 	public:
 		MutationTable() {
-			m_weights = {1u, 1u, 2u, 3u, 2u, 2u, 1u, 5u};
+			m_weights = {5u, 6u, 10u, 15u, 10u, 11u, 5u, 25u};
 			setup();
 		};
 		MutationTable(const std::array<unsigned int, MutationTypesCount> weights) : m_weights(weights) {
