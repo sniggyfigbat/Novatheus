@@ -24,9 +24,9 @@
 #define COL_DARK	sf::Color(90,  90,  90)
 
 // Params
-#define NEURON_COUNT_MIN 1000
-#define NEURON_COUNT_MAX 10000
-#define NEURON_CONNECTION_COUNT_MAX 256
+#define NEURON_COUNT_MIN 1000u
+#define NEURON_COUNT_MAX 10000u
+#define NEURON_CONNECTION_COUNT_MAX 256u
 
 namespace Utils {
 	std::string floatToStr(float in, uint precision = 2);

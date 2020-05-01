@@ -1,44 +1,38 @@
 #pragma once
 #include "core\neuron.h"
-#include "squishifier.h"
+#include "core\squishifier.h"
+#include "core\genome.h"
+#include "core\sample.h"
 
 namespace Core {
-	
-	
-	template <uint inputCount, uint outputCount>
 	class Network {
+		friend class Neuron;
 	protected:
-		uint m_neuronCount;
+		Genome* p_source;
+
+		uint m_inputCount;
+		uint m_outputCount;
+
 		uint m_valueBufferSize;
-		Neuron* mp_neurons = nullptr; // C-array of neurons.
+
+		uint m_neuronCount;
+		std::vector<Neuron> m_neurons;
 
 		Squishifier* mp_squishifier = nullptr;
+
+		float m_batchAverageCost = 0.0f;
+		std::queue<float> m_costBuffer; // Used for tracking a rolling buffer of costs over the last n minibatches.
 	public:
-		Network(std::vector<Neuron::Weight> ) {
-			
-		};
+		Network(Genome * source, Squishifier* squishifier = nullptr);
 		~Network();
 
 		float* mp_valueBuffer = nullptr; // C-array of values, used to store neuron outputs when feeding forward.
 
-		std::array<float, outputCount> RunNetwork(std::array<float, inputCount>& inputs)
-		{
-			// Input values, suitably squished.
-			for (uint i = 0; i < inputCount; i++) {
-				mp_valueBuffer[i] = mp_squishifier->squish(inputs[i]);
-			}
+		uint getInputCount() const { return m_inputCount; }
+		uint getOutputCount() const { return m_outputCount; }
 
-			// Run the neurons
-			for (uint i = 0; i < m_neuronCount; i++) {
-				mp_valueBuffer[inputCount + i] = mp_neurons[i].calculate(mp_squishifier);
-			}
+		std::vector<float> runNetwork(std::vector<float>& inputs, bool prepForBackprop = false);
 
-			// Build a return a vector from outputs.
-			std::array<float, outputCount> returnVals;
-			std::copy()
-			std::copy((mp_valueBuffer + (m_valueBufferSize - outputCount)), (mp_valueBuffer + (m_valueBufferSize - 1)), returnVals[0]);
-			//returnVals.assign((mp_valueBuffer + (m_valueBufferSize - m_outputCount)), (mp_valueBuffer + (m_valueBufferSize - 1)));
-			return returnVals;
-		}
+		void trainFromMiniBatch(const std::vector<Sample*>& samples, float learningRate);
 	};
 }
