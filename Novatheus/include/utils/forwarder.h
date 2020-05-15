@@ -12,9 +12,19 @@ namespace Utils {
 	class Forwarder {
 	private:
 		bool m_depreciated = false; //!< Whether or not this forwarder still has valid links.
+
+		std::mutex m_idMutex;
+		unsigned int m_nextFreeID = 0u;
 	public:
 		inline bool isDepreciated() { return m_depreciated; }
 		inline void setDepreciated(bool newValue = true) { m_depreciated = newValue; }
+
+		unsigned int getUniqueID() {
+			std::lock_guard<std::mutex> m(m_idMutex);
+			unsigned int retVal = m_nextFreeID;
+			++m_nextFreeID;
+			return retVal;
+		};
 
 		std::default_random_engine * p_rng;
 		Utils::AssetManager * p_assetManager;
@@ -34,13 +44,18 @@ namespace Utils {
 	};
 
 	class HasForwarder {
-	protected:
+	private:
 		Forwarder * mp_forwarder;
-
-		HasForwarder(Forwarder * forwarder) : mp_forwarder(forwarder) {};
+		unsigned int m_id;
+	protected:
+		HasForwarder(Forwarder * forwarder) :
+			mp_forwarder(forwarder),
+			m_id(forwarder->getUniqueID())
+		{};
 	public:
 		inline Forwarder * getForwarder() { return mp_forwarder; }
-		
+		inline unsigned int getID() { return m_id; }
+
 		inline std::default_random_engine * getRNG() { return mp_forwarder->p_rng; }
 		inline Utils::AssetManager * getAssetManager() { return mp_forwarder->p_assetManager; }
 		sf::Texture * getTexture(std::string name);

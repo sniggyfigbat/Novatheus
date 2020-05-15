@@ -12,9 +12,11 @@ namespace Core {
 		ConnectionAddition,
 		ConnectionDeletion,
 		ConnectionIDDrift,
-		ConnectionWeightDrift
+		ConnectionWeightDrift,
+		LRStartDrift,
+		LREndDrift
 	};
-#define MutationTypesCount 8
+#define MutationTypesCount 10
 
 	class MutationTable {
 	private:
@@ -28,7 +30,7 @@ namespace Core {
 		std::uniform_int_distribution<int> m_distribution;
 	public:
 		MutationTable() {
-			m_weights = {5u, 6u, 10u, 15u, 10u, 11u, 5u, 25u};
+			m_weights = {5u, 6u, 10u, 15u, 10u, 11u, 5u, 25u, 1u, 1u};
 			setup();
 		};
 		MutationTable(const std::array<unsigned int, MutationTypesCount> weights) : m_weights(weights) {
@@ -59,14 +61,14 @@ namespace Core {
 		}
 
 		MutationTypes operator [](int i) const {
-			if (i >= 0 && i < m_totalWeight) { return mp_mutationTable[i]; }
+			if (i >= 0 && i < (int)m_totalWeight) { return mp_mutationTable[i]; }
 			else {
 				WARN("MutationTable bracket operator called with invalid index ({0}). Returning default Mutation Type ({1}).", i, m_defaultValue);
 				return m_defaultValue;
 			}
 		}
 		MutationTypes& operator [](int i) {
-			if (i >= 0 && i < m_totalWeight) { return mp_mutationTable[i]; }
+			if (i >= 0 && i < (int)m_totalWeight) { return mp_mutationTable[i]; }
 			else {
 				WARN("MutationTable bracket operator called with invalid index ({0}). Returning index 0 instead.", i, m_defaultValue);
 				return mp_mutationTable[0];

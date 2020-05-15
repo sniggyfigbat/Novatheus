@@ -12,7 +12,7 @@ namespace Core {
 			uint va = idsToIndices[w.first];
 			int na = va - parent->getInputCount();
 			
-			m_weights.push_back(Weight(va, na, w.second));
+			m_weights.emplace_back(va, na, w.second);
 		}
 	}
 
@@ -36,16 +36,16 @@ namespace Core {
 		return output;
 	}
 
-	void Neuron::runBackprop(uint totalSampleCountInBatch)
+	void Neuron::runBackprop()
 	{
 		float delCdelZ = m_delAdelZ * m_delCdelA;
 		
 		// Bias
-		m_biasCurrentBatchAverageGradient += delCdelZ / (float)totalSampleCountInBatch;
+		m_biasCurrentBatchCombinedGradient += delCdelZ;
 
 		for (auto& w : m_weights) {
 			// Weight
-			w.addGradientForSample(p_parent->mp_valueBuffer[w.m_valueAddress] * delCdelZ, totalSampleCountInBatch);
+			w.addGradientForSample(p_parent->mp_valueBuffer[w.m_valueAddress] * delCdelZ);
 			
 			// Chained to earlier neuron.
 			if (!w.m_isInput) {
@@ -54,15 +54,15 @@ namespace Core {
 		}
 	}
 
-	void Neuron::endBatch(float learningRate)
+	void Neuron::endBatch(float learningRate, uint totalSampleCountInBatch)
 	{
 		// Bias;
-		m_bias += m_biasCurrentBatchAverageGradient * learningRate;
-		m_biasCurrentBatchAverageGradient = 0.0f;
+		m_bias -= (m_biasCurrentBatchCombinedGradient * learningRate) / (float)totalSampleCountInBatch;
+		m_biasCurrentBatchCombinedGradient = 0.0f;
 
 		// Weights
 		for (auto& w : m_weights) {
-			w.resetForNewBatch(learningRate);
+			w.endBatch(learningRate, totalSampleCountInBatch);
 		}
 	}
 }

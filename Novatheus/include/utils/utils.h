@@ -28,6 +28,43 @@
 #define NEURON_COUNT_MAX 10000u
 #define NEURON_CONNECTION_COUNT_MAX 256u
 
+#define MINIBATCH_COUNT 100u
+#define CROSSVAL_COUNT 10u
+
+#define OUTPUT_COUNT 10u
+#define STANDARD_TRAINING_BATCH_COUNT 1260u
+
+// GEN_WIDTH must be a multiple of 16.
+#define GEN_WIDTH 16u
+
 namespace Utils {
 	std::string floatToStr(float in, uint precision = 2);
+
+	class FileInHandler {
+	private:
+		std::ifstream& r_is;
+	public:
+		FileInHandler(std::ifstream& is) :
+			r_is(is) {}
+
+		template <typename T>
+		// Credit: https://stackoverflow.com/questions/46606401/how-can-i-write-a-number-directly-to-an-ofstream-object
+		void readItem(T& item) {
+			r_is.read(reinterpret_cast<char*>(&item), sizeof T);
+		}
+	};
+
+	class FileOutHandler {
+	private:
+		std::ofstream& r_os;
+	public:
+		FileOutHandler(std::ofstream& os) :
+			r_os(os) {}
+
+		template <typename T>
+		// Credit: https://stackoverflow.com/questions/46606401/how-can-i-write-a-number-directly-to-an-ofstream-object
+		void writeItem(const T& item) {
+			r_os.write(reinterpret_cast<const char*>(&item), sizeof T);
+		}
+	};
 };

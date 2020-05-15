@@ -1,6 +1,8 @@
 #pragma once
 #include "utils\utils.h"
+#include "core\metrics.h"
 #include "core\squishifier.h"
+#include "core\genome.h"
 
 namespace Core {
 	class Network;
@@ -27,12 +29,12 @@ namespace Core {
 				else { m_neuronAddress = (uint)neuronAddress; }
 			};
 
-			void addGradientForSample(float sample, uint totalSampleCountInBatch) {
-				m_currentBatchAverageGradient += (sample / (float)totalSampleCountInBatch);
+			void addGradientForSample(float sample) {
+				m_currentBatchAverageGradient += sample;
 			}
 
-			void resetForNewBatch(float learningRate) {
-				m_weight += (m_currentBatchAverageGradient * learningRate);
+			void endBatch(float learningRate, uint totalSampleCountInBatch) {
+				m_weight -= (m_currentBatchAverageGradient * learningRate) / (float)totalSampleCountInBatch;
 				m_currentBatchAverageGradient = 0.0f;
 			}
 		};
@@ -41,10 +43,10 @@ namespace Core {
 
 		std::vector<Neuron::Weight> m_weights;
 		float m_bias;
-		float m_biasCurrentBatchAverageGradient = 0.0f;
+		float m_biasCurrentBatchCombinedGradient = 0.0f;
 
-		float m_delAdelZ; // Change in neuron output over change in weighted sum. Calculated using inverse squishification func.
-		float m_delCdelA; // Change in cost over change in neuron output.
+		float m_delAdelZ = 0.0f; // Change in neuron output over change in weighted sum. Calculated using inverse squishification func.
+		float m_delCdelA = 0.0f; // Change in cost over change in neuron output.
 	public:
 		Neuron(Network * parent, const Chromosome & chromosome, std::map<uint, uint> & idsToIndices);
 		~Neuron();
@@ -54,8 +56,10 @@ namespace Core {
 		float getBias() const { return m_bias; }
 		Neuron& setBias(float newBias) { m_bias = newBias; return *this; }
 
-		void setDelCdelA(float delCdelA) { m_delCdelA = delCdelA; }
-		void runBackprop(uint totalSampleCountInBatch);
-		void endBatch(float learningRate);
+		void setDelCdelA(float delCdelA) {
+			m_delCdelA = delCdelA;
+		}
+		void runBackprop();
+		void endBatch(float learningRate, uint totalSampleCountInBatch);
 	};
 }

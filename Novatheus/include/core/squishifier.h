@@ -11,18 +11,25 @@ namespace Core {
 		virtual ~Squishifier() {};
 	};
 
+	// A quick and dirty squishifier, bounded between 0 and 1.
 	class FastSigmoid : public Squishifier {
 	public:
 		float squish(float input) const override {
 			// std::abs only works for longs, not floats. FFS.
-			if (input < 0.0f) { return (input / (1.0f - input)); }
-			return (input / (1.0f + input));
+
+			// y = 0.5(x/(1+|x|)) + 0.5
+			float t = (input < 0.0f) ? 2.0f * (1.0f - input) : 2.0f * (1.0f + input);
+			return ((input / t) + 0.5f);
 		}
 
 		float getDerivative(float input) const override {
 			// std::abs only works for longs, not floats. FFS.
+
+			// y' = 0.5 / (1 + |x|)^2
+			// Thank you, Wolfram.
+
 			float t = (input < 0.0f) ? (1.0f - input) : (1.0f + input);
-			return (1.0f / (t * t));
+			return (0.5f / (t * t));
 		}
 
 		FastSigmoid() : Squishifier() {};
