@@ -690,7 +690,7 @@ namespace Core {
 		while (!allShipshape) {
 			allShipshape = true;
 			if (child != nullptr) { delete child; }
-			child = new Genome(getForwarder(), m_populationID, m_inputCount, m_outputCount, m_generation + 1);
+			child = new Genome(getForwarder(), m_populationID, m_inputCount, m_outputCount, m_generation);
 
 			// Learning Rate
 			child->m_startLRExponent = (m_startLRExponent > other->m_startLRExponent) ? std::uniform_real_distribution<float>(other->m_startLRExponent, m_startLRExponent)(*getRNG()) : std::uniform_real_distribution<float>(m_startLRExponent, other->m_startLRExponent)(*getRNG());

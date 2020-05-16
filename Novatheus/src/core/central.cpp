@@ -177,14 +177,12 @@ namespace Core {
 		for (uint i = 0; i < threeSixteenths; i++) {
 			mvp_generation.push_back(lastGen[i]);
 			keep[i] = true;
-			mvp_generation[index]->incrementGeneration();
 			index++;
 		}
 
 		// One totally new genome.
 		for (uint i = 0; i < oneSixteenth; i++) {
 			mvp_generation.push_back(new Genome(mp_forwarder, popID, 28u * 28u, OUTPUT_COUNT, true));
-			mvp_generation[index]->incrementGeneration();
 			index++;
 		}
 
@@ -243,7 +241,6 @@ namespace Core {
 			mvp_generation.push_back(lastGen[threeSixteenths + i]);
 			keep[threeSixteenths + i] = true;
 			mvp_generation[index]->mutate();
-			mvp_generation[index]->incrementGeneration();
 			index++;
 		}
 
@@ -252,7 +249,6 @@ namespace Core {
 			mvp_generation.push_back(lastGen[threeSixteenths + threeSixteenths + i]);
 			keep[threeSixteenths + threeSixteenths + i] = true;
 			mvp_generation[index]->mutate(true);
-			mvp_generation[index]->incrementGeneration();
 			index++;
 		}
 
@@ -260,6 +256,8 @@ namespace Core {
 		for (uint i = 0; i < GEN_WIDTH; i++) {
 			if (!keep[i]) { delete lastGen[i]; }
 		}
+
+		for (uint i = 0; i < GEN_WIDTH; i++) { mvp_generation[i]->incrementGeneration(); }
 
 		INFO("Successfully stepped population (popID{0}) to generation {1}.",
 			mvp_generation[0]->getPopulationID(),
