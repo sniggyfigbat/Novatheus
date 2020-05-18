@@ -44,5 +44,10 @@ namespace Core {
 		std::tuple<float, float, float> testFromBatch(Batch& batch); // Returns average cost and total correct answers.
 		
 		Metrics trainFromDataset(Dataset* dataset, std::array<bool, CROSSVAL_COUNT> crossvalidationSections, uint batches, uint batchOffset = 0u, bool detailedOutput = false);
+		void setLearningRate(float startExponent, float deltaExponent) {
+			m_startLRE = startExponent;
+			m_LRDelta = deltaExponent;
+			m_LRDeltaPerBatch = m_LRDelta / (float)STANDARD_TRAINING_BATCH_COUNT;
+		}
 	};
 }

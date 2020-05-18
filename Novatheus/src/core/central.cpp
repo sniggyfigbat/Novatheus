@@ -713,6 +713,21 @@ namespace Core {
 			stepPopulation();
 			return;
 		}
+		else if (command == "set_network_lr" ||
+			command == "snlr") {
+			if (mp_network == nullptr) {
+				WARN("No genome available to save! Use 'gen_random_network' ('grn'), followed by 'train_network' ('tn').");
+				return;
+			}
+
+			if (params.size() < 2) {
+				WARN("Inadequate parameter count, cannot alter network learning rate. Use should be in the form 'set_network_lr startExponent deltaExponent', eg. 'snlr 1.0 -4.0'.");
+				return;
+			}
+
+			mp_network->setLearningRate(std::stof(params[0]), std::stof(params[1]));
+			INFO("Set network learning rate to (2^{0})->(2^{1}).", params[0], params[1]);
+		}
 		else if (command == "about") {
 			INFO("Project Novatheus was built by Sniggyfigbat as part of a Master's-level coursework.");
 			INFO("Github: https://github.com/sniggyfigbat/Novatheus");
@@ -734,6 +749,7 @@ namespace Core {
 			INFO("  - 'save_population' ('sp') :\t\tSaves the population to file, in the appropriate subfolder of 'Novatheus/genomes/'.");
 			INFO("  - 'load_population' ('lp') :\t\tuint populationID, uint generation :\tLoads to the population slot the genomes found in the corresponding file, 'Novatheus/genomes/$populationID$/$generation$.population'.");
 			INFO("  - 'step_population' ('step_p') :\t\tRuns the generation-incrementation code on the population slot.");
+			INFO("  - 'set_network_lr' ('snlr') :\t\tfloat startExponent, float deltaExponentSets.\tSets the learning-rate-calculation variables in the solo-slot network.");
 			INFO("");
 			CRITICAL("IMPORTANT! When training, populations are saved AFTER testing but BEFORE the next generation is generated. As such, always run 'step_p' after loading a population, before further training.");
 			INFO("");

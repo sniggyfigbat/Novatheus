@@ -13,6 +13,7 @@ int main(int argc, char* argv[]) {
 	Core::CentralController central;
 
 	INFO("Program initialised.");
+	INFO("Enter 'help' for command list.");
 
 	while (central.runLoop()) {}
 
